@@ -1,16 +1,10 @@
+##Pre-Process data
+import PreProcessing as PreProc
+
 ## importing visualization libraries
 import matplotlib.pyplot as plt
 import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
 
-# Scatter plot with day against tip
-plt.scatter(data["day"], data["tip"])
-
-# Adding Title to the Plot
-plt.title("Scatter Plot")
-
-# Setting the X and Y labels
-plt.xlabel("Day")
-plt.ylabel("Tip")
-
-plt.show()
+ax = plt.axes(projection="3d")
+ax.scatter3D(PreProc.df("xs"), PreProc.df("ys"), PreProc.df("zs"), c=PreProc.df("zs"), cmap="Greens")

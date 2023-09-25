@@ -39,3 +39,9 @@ df["zs"] = df.apply(lambda row: row["distance"] * math.cos(row["tilt_rad"]), axi
 
 ## flip axis (because original read was from right-to-left)
 df["xs"] = df.apply(lambda row: row["xs"] * -1, axis=1)
+
+
+##Isolate object scan data from forfront and backdrop data
+subject_data = df.loc[
+    (df["distance"] >= 30) & (df["distance"] <= 35), df["xs"] & df["zs"]
+]

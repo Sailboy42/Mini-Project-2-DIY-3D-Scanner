@@ -10,27 +10,25 @@ while True:
     # ask for a line of data from the serial port, the ".decode()" converts the
     # data from an "array of bytes", to a string
     #
-    lineOfData = serialPort.readline().decode()
+    ScanData = serialPort.readline().decode()
 
     #
     # check if data was received
     #
-    if len(lineOfData) > 0:
-        #
-        # data was received, convert it into 4 integers
-        #
-        a, b, c, d = (int(x) for x in lineOfData.split(","))
+    if len(ScanData) > 0:
+        df = pd.DataFrame(ScanData)  # convert list to dataframe
 
-        # list of name, degree, score
-        nme = ["aparna", "pankaj", "sudhir", "Geeku"]
-        deg = ["MBA", "BCA", "M.Tech", "MBA"]
-        scr = [90, 40, 80, 98]
+        file_path = "3DScan"
 
-        # dictionary of lists
-        dict = {"name": nme, "degree": deg, "score": scr}
-
-        df = pd.DataFrame(dict)
-
-        print(df)
-
-        df.to_csv("file1.csv")
+        try:
+            df.to_csv(file_path, index=False, mode="x")
+            print(f"The file '{file_path}' has been created.")
+        except FileExistsError:
+            overwrite = input(
+                f"The file '{file_path}' already exists. Do you want to overwrite it? (y/n): "
+            )
+            if overwrite.lower() == "y":
+                df.to_csv(file_path, index=False, mode="w")
+                print(f"The file '{file_path}' has been overwritten.")
+            else:
+                print(f"The file '{file_path}' has not been overwritten.")

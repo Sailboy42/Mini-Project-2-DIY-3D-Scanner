@@ -8,6 +8,16 @@ df = pd.read_csv(
     header=0,
     names=["ir_read", "orig_tilt_deg", "orig_pan_deg"],
 )
+
+"""***************************************************************************************
+*    Title: 3D Scanner 3D data projection and visualization
+*    Author: Gati Aher
+*    Date: Sep 28, 2021
+*    Code version: 1
+*    Availability: https://gatiaher.github.io/projects/building-a-pan-tilt-3d-scanner/#cad-design-of-pan-tilt-mount
+*
+***************************************************************************************"""
+
 ## delete last row with end signal 0,0,0
 df = df[:-1]
 

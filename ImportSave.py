@@ -18,6 +18,14 @@ while True:
     if len(ScanData) > 0:
         df = pd.DataFrame(ScanData)  # convert list to dataframe
 
+        """***************************************************************************************
+        *    Title: Pandas tocsv Checking for Overwrite Using Mode Paramter
+        *    Author: Saturn Cloud
+        *    Date: Monday, June 19, 2023
+        *    Code version: 1
+        *    Availability: https://saturncloud.io/blog/pandas-tocsv-checking-for-overwrite/
+        *
+        ***************************************************************************************"""
         file_path = "3DScan"
 
         try:

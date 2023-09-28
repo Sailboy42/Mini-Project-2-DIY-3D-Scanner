@@ -1,71 +1,62 @@
-/*SHARP GP2Y0A21YK0F IR distance sensor with Arduino and SharpIR library example code. More info: https://www.makerguides.com */
-
-// Include the library:
-#include <SharpIR.h>
-
 // Define model and input pin:
 #define IRPin A0
 #define model 20150
 
 // Create variable to store the distance:
-int distance_cm;
+int IR_data;
 
-/* Model :
-  GP2Y0A02YK0F --> 20150
-  GP2Y0A21YK0F --> 1080
-  GP2Y0A710K0F --> 100500
-  GP2YA41SK0F --> 430
+#define sensor A0 // Sharp IR GP2Y0A02YF
+
+
+const uint16_t SERVO_PERIOD = 20;       // Period of servo position control signals in milliseconds
+const uint16_t SERVO_MIN_WIDTH = 900;   // Minimum servo control signal pulse width in microseconds
+const uint16_t SERVO_MAX_WIDTH = 2100;  // Maximum servo control signal pulse width in microseconds
+const uint8_t SERVO1 = 6;               // Servo1 control signal is connected to D9
+const uint8_t SERVO2 = 7;              // Servo2 control signal is connected to D10
+
+uint32_t servo_time;                    // Global variable to store the time of the last servo update
+
+/*
+** Returns a boolean value that indicates whether the current time, t, is later than some prior 
+** time, t0, plus a given interval, dt.  The condition accounts for timer overflow / wraparound.
 */
-
-// Create a new instance of the SharpIR class:
-SharpIR mySensor = SharpIR(IRPin, model);
+bool it_is_time(uint32_t t, uint32_t t0, uint16_t dt) {
+  return ((t >= t0) && (t - t0 >= dt)) ||         // The first disjunct handles the normal case
+            ((t < t0) && (t + (~t0) + 1 >= dt));  //   while the second handles the overflow case
+}
 
 void setup() {
-  // Begin serial communication at a baudrate of 9600:
+  // Begin serial communication at a baud rate of 9600:
   Serial.begin(9600);
+  pinMode(SERVO1, OUTPUT);
+  digitalWrite(SERVO1, LOW);
+  pinMode(SERVO2, OUTPUT);
+  digitalWrite(SERVO2, LOW);
+  servo_time = millis();
 }
 
 void loop() {
-  // Get a distance measurement and store it as distance_cm:
-  distance_cm = mySensor.distance();
+  uint32_t t;
+  uint16_t servo1_pos, servo2_pos;
 
+  t = millis();
+  if (it_is_time(t, servo_time, SERVO_PERIOD)) { 
+    servo1_pos = 100;
+    servo2_pos = 100;
+    digitalWrite(SERVO1, HIGH);
+    delayMicroseconds(servo1_pos);
+    digitalWrite(SERVO1, LOW);
+    digitalWrite(SERVO2, HIGH);
+    delayMicroseconds(servo2_pos);
+    digitalWrite(SERVO2, LOW);
+    servo_time = t;
+
+    // Get a IR data
+  IR_data = analogRead(sensor);
+  }
+  
   // Print the measured distance to the serial monitor:
-  Serial.print("Mean distance: ");
-  Serial.print(distance_cm);
-  Serial.println(" cm");
-
+  Serial.println(IR_data);
+  
   delay(400);
 }
-
-/*
-MIT License
-Copyright 2021 Michael Schoeffler (https://www.mschoeffler.com)
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-*/
-/*
-* Example source code of an Arduino tutorial on how to control an MG 996R servo motor. 
-*/
-/*
-#include <Servo.h> 
-
-Servo servo; // servo object representing the MG 996R servo
-
-void setup() {
-  servo.attach(3); // servo is wired to Arduino on digital pin 3
-}
-
-void loop() {
-  servo.write(0); // move MG996R's shaft to angle 0°
-  delay(1000); // wait for one second
-  servo.write(45); // move MG996R's shaft to angle 45°
-  delay(1000); // wait for one second 
-  servo.write(90); // move MG996R's shaft to angle 90°
-  delay(1000); // wait for one second
-  servo.write(135); // move MG996R's shaft to angle 135°
-  delay(1000); // wait for one second
-  servo.write(180); // move MG996R's shaft to angle 180°
-  delay(1000); // wait for one second
-}
-*/
